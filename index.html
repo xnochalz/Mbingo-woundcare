@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Wound Care</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript" src="web3.min.js"></script>
+    <script language="javascript" type="text/javascript" src="woundcare_abi.js"></script>
+  </head>
+  <body style="background-color: #6ddccf;">
+     <div class="container">
+      <div class="row">
+        <div class="col-xs-12 col-sm-8 col-sm-push-2">
+          <h1 class="text-center"><img src="images/medical-informatics.jpeg" alt="wound"><p></p><p style="margin top: 25;">Wound Care</p></h1>
+          <h2 id="instructor"></h2>
+          <hr/>
+          <br/>
+
+    <div id="patients"></div>
+
+    <script>
+      var Final;
+      var userAccount;
+
+      function startApp() {
+        var woundcareAddress = "0x1791457Dc970422b617c909612cafB0cEc236Ed3";
+        Final = new web3js.eth.Contract(FinalABI, woundcareAddress);
+
+        var accountInterval = setInterval(function() {
+          // Check if account has changed
+          if (web3.eth.accounts[0] !== userAccount) {
+            userAccount = web3.eth.accounts[0];
+            // Call a function to update the UI with the new account
+            Wound(userAccount)
+            .then(displayPatients);
+          }
+        }, 100);
+      }
+
+      function displayPatients(ids) {
+        // empty the Patient div
+        $("#patients").empty();
+        for (id of ids){
+          // Look up Patient details from  contract. Returns a `Patient` object
+getPatientDetails(id)
+.then(function(Patient) {
+  // Using ES6's "template literals" to inject variables into the HTML.
+  // Append each one to our #patients div
+  $("#patients").append(`<div class="Patient">
+    <ul>
+      <li>id: ${Patient.id}</li>
+      <li>name: ${Patient.name}</li>
+      <li>Phone: ${Patient.Phone}</li>
+      <li>Birthday: ${Patient.Birthday}</li>
+      <li>Sex: ${Patient.Sex}</li>
+      <li>MRN: ${Patient.MRN}</li>
+      <li>Division: ${Patient.Division}</li>
+      <li>Country: ${Patient.Country}</li>
+    </ul>
+  </div>`);
+});
+        }
+      }
+
+      function getPatientDetails(id) {
+        return Final.methods.patients(id).call()
+      }
+
+      function patients(id) {
+        return Final.methods.patients(id).call()
+      }
+
+      function Wound(name, MRN, Birthday, Sex, Phone, Division, Country) {
+        return Final.methods.Wound(name, MRN, Birthday, Sex, Phone, Division, Country).call()
+      }
+
+      window.addEventListener('load', function() {
+
+        if (typeof web3 !== 'undefined') {
+          
+          web3js = new Web3(web3.currentProvider);
+        } else {
+          
+        }
+        startApp()
+
+      })
+    </script>
+  </body>
+</html>
